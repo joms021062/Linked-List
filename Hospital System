@@ -1,0 +1,214 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstdio> 
+
+
+struct Node {
+    std::string name;
+    int age;
+    float height;
+    Node* next;
+
+    Node(std::string name, int age, float height) : name(name), age(age), height(height), next(nullptr) {}
+};
+
+Node* addRecord(Node* head, std::string name, int age, float height);
+Node* updateRecord(Node* head, std::string targetName);
+void viewPatientRecords(Node* head);
+void saveToFile(Node* head, std::string filename);
+void loadFromFile(Node*& head, std::string filename);
+void deleteFile(std::string filename);
+void displayMenu(Node*& head);
+
+int main() {
+    Node* head = nullptr;
+    displayMenu(head);
+    return 0;
+}
+
+
+Node* addRecord(Node* head, std::string name, int age, float height) {
+    Node* newNode = new Node(name, age, height);
+    if (head == nullptr) {
+        head = newNode;
+    }
+    else {
+        Node* temp = head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+    std::cout << "\nRecord added successfully." << std::endl;
+    return head;
+}
+
+Node* updateRecord(Node* head, std::string targetName) {
+    Node* current = head;
+    bool found = false;
+    while (current != nullptr) {
+        if (current->name == targetName) {
+            found = true;
+            std::cout << "\nWhat information do you want to update?" << std::endl;
+            std::cout << "1. Name" << std::endl;
+            std::cout << "2. Age" << std::endl;
+            std::cout << "3. Height" << std::endl;
+            int choice;
+            std::cout << "\nEnter your choice (1, 2, or 3): ";
+            std::cin >> choice;
+            switch (choice) {
+            case 1:
+                std::cout << "Enter new name: ";
+                std::cin >> current->name;
+                break;
+            case 2:
+                std::cout << "Enter new age: ";
+                std::cin >> current->age;
+                break;
+            case 3:
+                std::cout << "Enter new height: ";
+                std::cin >> current->height;
+                break;
+            default:
+                std::cout << "Invalid choice!" << std::endl;
+                break;
+            }
+            std::cout << "\nRecord updated successfully!" << std::endl;
+            break;
+        }
+        current = current->next;
+    }
+    if (!found) {
+        std::cout << "\nNo record found with the specified name." << std::endl;
+    }
+    return head;
+}
+
+void viewPatientRecords(Node* head) {
+    if (head == nullptr) {
+        std::cout << "\nNo records found." << std::endl;
+        return;
+    }
+    Node* temp = head;
+    while (temp != nullptr) {
+        std::cout << "Name: " << temp->name << ", Age: " << temp->age << ", Height: " << temp->height << std::endl;
+        temp = temp->next;
+    }
+}
+
+void saveToFile(Node* head, std::string filename) {
+    std::ofstream file(filename);
+    if (!file) {
+        std::cout << "\nError opening file." << std::endl;
+        return;
+    }
+    Node* temp = head;
+    while (temp != nullptr) {
+        file << temp->name << " " << temp->age << " " << temp->height << std::endl;
+        temp = temp->next;
+    }
+    file.close();
+    std::cout << "\nRecords saved to " << filename << " successfully." << std::endl;
+}
+
+void loadFromFile(Node*& head, std::string filename) {
+    std::ifstream file(filename);
+    if (!file) {
+        std::cout << "\nError opening file." << std::endl;
+        return;
+    }
+    std::string name;
+    int age;
+    float height;
+    while (file >> name >> age >> height) {
+        head = addRecord(head, name, age, height);
+    }
+    file.close();
+    std::cout << "\nRecords loaded from " << filename << " successfully." << std::endl;
+}
+
+void deleteFile(std::string filename) {
+    if (std::remove(filename.c_str()) != 0) {
+        std::cout << "\nError deleting file." << std::endl;
+    }
+    else {
+        std::cout << "\nFile " << filename << " deleted successfully." << std::endl;
+    }
+}
+
+void displayMenu(Node*& head) {
+    int choice;
+    while (true) {
+        system("cls");
+        std::cout << "\n===========================";
+        std::cout << "\n    Uprising Hospital";
+        std::cout << "\n       Patient Menu";
+        std::cout << "\n===========================" << std::endl;
+        std::cout << "\n1. Add Patient Record" << std::endl;
+        std::cout << "2. Update Patient Record" << std::endl;
+        std::cout << "3. View Patient Records" << std::endl;
+        std::cout << "4. Save Patient File" << std::endl;
+        std::cout << "5. Load Patient File" << std::endl;
+        std::cout << "6. Delete Patient File" << std::endl;
+        std::cout << "7. Exit" << std::endl;
+        std::cout << "\nEnter your choice: ";
+        std::cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            std::string name;
+            int age;
+            float height;
+            std::cout << "\nEnter patient name: ";
+            std::cin >> name;
+            std::cout << "Enter patient age: ";
+            std::cin >> age;
+            std::cout << "Enter patient height in cm: ";
+            std::cin >> height;
+            head = addRecord(head, name, age, height);
+            break;
+        }
+        case 2: {
+            std::string targetName;
+            std::cout << "\nEnter the name of the patient to update: ";
+            std::cin >> targetName;
+            head = updateRecord(head, targetName);
+            break;
+        }
+        case 3:
+            viewPatientRecords(head);
+            break;
+        case 4: {
+            std::string filename;
+            std::cout << "\nEnter filename to save: ";
+            std::cin >> filename;
+            saveToFile(head, filename);
+            break;
+        }
+        case 5: {
+            std::string filename;
+            std::cout << "\nEnter filename to load: ";
+            std::cin >> filename;
+            loadFromFile(head, filename);
+            break;
+        }
+        case 6: {
+            std::string filename;
+            std::cout << "\nEnter filename to delete: ";
+            std::cin >> filename;
+            deleteFile(filename);
+            break;
+        }
+        case 7:
+            std::cout << "\nExiting program." << std::endl;
+            return;
+        default:
+            std::cout << "\nInvalid choice!" << std::endl;
+            break;
+        }
+        std::cout << "\nPress Enter to continue...";
+        std::cin.ignore();
+        std::cin.get();
+    }
+}
