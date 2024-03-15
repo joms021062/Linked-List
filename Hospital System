@@ -1,74 +1,88 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cstdio> 
-
+#include <cstdio>
 
 struct Node {
-    std::string name;
-    int age;
-    float height;
-    Node* next;
+    std::string FirstName, MiddleName, Surname;
+    int Age;
+    float Height, Weight;
+    Node* Next;
 
-    Node(std::string name, int age, float height) : name(name), age(age), height(height), next(nullptr) {}
+    Node(std::string firstName, std::string middleName, std::string surname, int age, float height, float weight)
+        : FirstName(firstName), MiddleName(middleName), Surname(surname), Age(age), Height(height), Weight(weight), Next(nullptr) {}
 };
 
-Node* addRecord(Node* head, std::string name, int age, float height);
-Node* updateRecord(Node* head, std::string targetName);
-void viewPatientRecords(Node* head);
-void saveToFile(Node* head, std::string filename);
-void loadFromFile(Node*& head, std::string filename);
-void deleteFile(std::string filename);
-void displayMenu(Node*& head);
+Node* AddRecord(Node* head, std::string firstName, std::string middleName, std::string surname, int age, float height, float weight);
+Node* UpdateRecord(Node* head, std::string targetSurname);
+void ViewPatientRecords(Node* head);
+void SaveToFile(Node* head, std::string filename);
+void LoadFromFile(Node*& head, std::string filename);
+void DeleteFile(std::string filename);
+void DisplayMenu(Node*& head);
 
 int main() {
     Node* head = nullptr;
-    displayMenu(head);
+    DisplayMenu(head);
     return 0;
 }
 
-
-Node* addRecord(Node* head, std::string name, int age, float height) {
-    Node* newNode = new Node(name, age, height);
+Node* AddRecord(Node* head, std::string firstName, std::string middleName, std::string surname, int age, float height, float weight) {
+    Node* newNode = new Node(firstName, middleName, surname, age, height, weight);
     if (head == nullptr) {
         head = newNode;
     }
     else {
         Node* temp = head;
-        while (temp->next != nullptr) {
-            temp = temp->next;
+        while (temp->Next != nullptr) {
+            temp = temp->Next;
         }
-        temp->next = newNode;
+        temp->Next = newNode;
     }
     std::cout << "\nRecord added successfully." << std::endl;
     return head;
 }
 
-Node* updateRecord(Node* head, std::string targetName) {
+Node* UpdateRecord(Node* head, std::string targetSurname) {
     Node* current = head;
     bool found = false;
     while (current != nullptr) {
-        if (current->name == targetName) {
+        if (current->Surname == targetSurname) {
             found = true;
-            std::cout << "\nWhat information do you want to update?" << std::endl;
-            std::cout << "1. Name" << std::endl;
-            std::cout << "2. Age" << std::endl;
-            std::cout << "3. Height" << std::endl;
+            std::cout << "\nWhat information do you want to update for patient " << targetSurname << "?" << std::endl;
+            std::cout << "1. First Name" << std::endl;
+            std::cout << "2. Middle Name" << std::endl;
+            std::cout << "3. Surname" << std::endl;
+            std::cout << "4. Age" << std::endl;
+            std::cout << "5. Height" << std::endl;
+            std::cout << "6. Weight" << std::endl;
             int choice;
-            std::cout << "\nEnter your choice (1, 2, or 3): ";
+            std::cout << "\nEnter your choice (1-6): ";
             std::cin >> choice;
             switch (choice) {
             case 1:
-                std::cout << "Enter new name: ";
-                std::cin >> current->name;
+                std::cout << "Enter new first name: ";
+                std::cin >> current->FirstName;
                 break;
             case 2:
-                std::cout << "Enter new age: ";
-                std::cin >> current->age;
+                std::cout << "Enter new middle name: ";
+                std::cin >> current->MiddleName;
                 break;
             case 3:
+                std::cout << "Enter new surname: ";
+                std::cin >> current->Surname;
+                break;
+            case 4:
+                std::cout << "Enter new age: ";
+                std::cin >> current->Age;
+                break;
+            case 5:
                 std::cout << "Enter new height: ";
-                std::cin >> current->height;
+                std::cin >> current->Height;
+                break;
+            case 6:
+                std::cout << "Enter new weight: ";
+                std::cin >> current->Weight;
                 break;
             default:
                 std::cout << "Invalid choice!" << std::endl;
@@ -77,27 +91,27 @@ Node* updateRecord(Node* head, std::string targetName) {
             std::cout << "\nRecord updated successfully!" << std::endl;
             break;
         }
-        current = current->next;
+        current = current->Next;
     }
     if (!found) {
-        std::cout << "\nNo record found with the specified name." << std::endl;
+        std::cout << "\nNo record found with the specified surname." << std::endl;
     }
     return head;
 }
 
-void viewPatientRecords(Node* head) {
+void ViewPatientRecords(Node* head) {
     if (head == nullptr) {
         std::cout << "\nNo records found." << std::endl;
         return;
     }
     Node* temp = head;
     while (temp != nullptr) {
-        std::cout << "Name: " << temp->name << ", Age: " << temp->age << ", Height: " << temp->height << std::endl;
-        temp = temp->next;
+        std::cout << "Name: " << temp->FirstName << " " << temp->MiddleName << " " << temp->Surname << ", Age: " << temp->Age << ", Height: " << temp->Height << " cm, Weight: " << temp->Weight << " lb" << std::endl;
+        temp = temp->Next;
     }
 }
 
-void saveToFile(Node* head, std::string filename) {
+void SaveToFile(Node* head, std::string filename) {
     std::ofstream file(filename);
     if (!file) {
         std::cout << "\nError opening file." << std::endl;
@@ -105,30 +119,30 @@ void saveToFile(Node* head, std::string filename) {
     }
     Node* temp = head;
     while (temp != nullptr) {
-        file << temp->name << " " << temp->age << " " << temp->height << std::endl;
-        temp = temp->next;
+        file << temp->FirstName << " " << temp->MiddleName << " " << temp->Surname << " " << temp->Age << " " << temp->Height << " " << temp->Weight << std::endl;
+        temp = temp->Next;
     }
     file.close();
     std::cout << "\nRecords saved to " << filename << " successfully." << std::endl;
 }
 
-void loadFromFile(Node*& head, std::string filename) {
+void LoadFromFile(Node*& head, std::string filename) {
     std::ifstream file(filename);
     if (!file) {
         std::cout << "\nError opening file." << std::endl;
         return;
     }
-    std::string name;
+    std::string firstName, middleName, surname;
     int age;
-    float height;
-    while (file >> name >> age >> height) {
-        head = addRecord(head, name, age, height);
+    float height, weight;
+    while (file >> firstName >> middleName >> surname >> age >> height >> weight) {
+        head = AddRecord(head, firstName, middleName, surname, age, height, weight);
     }
     file.close();
     std::cout << "\nRecords loaded from " << filename << " successfully." << std::endl;
 }
 
-void deleteFile(std::string filename) {
+void DeleteFile(std::string filename) {
     if (std::remove(filename.c_str()) != 0) {
         std::cout << "\nError deleting file." << std::endl;
     }
@@ -137,7 +151,7 @@ void deleteFile(std::string filename) {
     }
 }
 
-void displayMenu(Node*& head) {
+void DisplayMenu(Node*& head) {
     int choice;
     while (true) {
         system("cls");
@@ -157,47 +171,53 @@ void displayMenu(Node*& head) {
 
         switch (choice) {
         case 1: {
-            std::string name;
+            std::string firstName, middleName, surname;
             int age;
-            float height;
-            std::cout << "\nEnter patient name: ";
-            std::cin >> name;
-            std::cout << "Enter patient age: ";
+            float height, weight; 
+            std::cout << "\nEnter patient's first name: ";
+            std::cin >> firstName;
+            std::cout << "Enter patient's middle name: ";
+            std::cin >> middleName;
+            std::cout << "Enter patient's surname: ";
+            std::cin >> surname;
+            std::cout << "Enter patient's age: ";
             std::cin >> age;
-            std::cout << "Enter patient height in cm: ";
+            std::cout << "Enter patient's height in cm: ";
             std::cin >> height;
-            head = addRecord(head, name, age, height);
+            std::cout << "Enter patient's weight in lb: ";
+            std::cin >> weight; 
+            head = AddRecord(head, firstName, middleName, surname, age, height, weight); 
             break;
         }
         case 2: {
-            std::string targetName;
-            std::cout << "\nEnter the name of the patient to update: ";
-            std::cin >> targetName;
-            head = updateRecord(head, targetName);
+            std::string targetSurname;
+            std::cout << "\nEnter the surname of the patient to update: ";
+            std::cin >> targetSurname;
+            head = UpdateRecord(head, targetSurname);
             break;
         }
         case 3:
-            viewPatientRecords(head);
+            ViewPatientRecords(head);
             break;
         case 4: {
             std::string filename;
             std::cout << "\nEnter filename to save: ";
             std::cin >> filename;
-            saveToFile(head, filename);
+            SaveToFile(head, filename);
             break;
         }
         case 5: {
             std::string filename;
             std::cout << "\nEnter filename to load: ";
             std::cin >> filename;
-            loadFromFile(head, filename);
+            LoadFromFile(head, filename);
             break;
         }
         case 6: {
             std::string filename;
             std::cout << "\nEnter filename to delete: ";
             std::cin >> filename;
-            deleteFile(filename);
+            DeleteFile(filename);
             break;
         }
         case 7:
